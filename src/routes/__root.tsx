@@ -43,10 +43,9 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
-      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "stylesheet", href: appCss },
       ...SPLASHES.map((s) => ({
         rel: "apple-touch-startup-image" as const,
@@ -67,7 +66,7 @@ export const Route = createRootRoute({
         <style
           dangerouslySetInnerHTML={{
             __html:
-              'html,body{background:#FFF7F1}html.show-gift .gift-overlay{position:fixed;inset:0;z-index:9999;opacity:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background-color:#FFF7F1;background-image:radial-gradient(ellipse 70% 50% at 50% 42%,rgb(255 212 194 / 55%),transparent 72%)}html.show-gift .gift-overlay::before{content:"";position:absolute;top:-16%;right:-28%;width:78%;height:46%;border-radius:50%;background:rgb(244 162 127 / 22%);pointer-events:none}html.show-gift .gift-overlay::after{content:"";position:absolute;bottom:-24%;left:-20%;width:110%;height:42%;border-radius:50% 40% 48% 52%;background:rgb(255 186 168 / 26%);pointer-events:none}html.gift-done .gift-overlay{display:none!important}html.gift-leaving .gift-overlay{animation:gift-fade-out 300ms ease both;pointer-events:none}@keyframes gift-fade-out{from{opacity:1}to{opacity:0}}',
+              'html,body,#app{height:100%;max-height:100svh}html,body{background:#FFF7F1;overflow:hidden}.app-root,.phone-canvas{min-height:100svh;height:100svh;max-height:100svh}html.show-gift .gift-overlay{position:fixed;inset:0;z-index:9999;opacity:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background-color:#FFF7F1;background-image:radial-gradient(ellipse 70% 50% at 50% 42%,rgb(255 212 194 / 55%),transparent 72%)}html.show-gift .gift-overlay::before{content:"";position:absolute;top:-16%;right:-28%;width:78%;height:46%;border-radius:50%;background:rgb(244 162 127 / 22%);pointer-events:none}html.show-gift .gift-overlay::after{content:"";position:absolute;bottom:-24%;left:-20%;width:110%;height:42%;border-radius:50% 40% 48% 52%;background:rgb(255 186 168 / 26%);pointer-events:none}html.gift-done .gift-overlay{display:none!important}html.gift-leaving .gift-overlay{animation:gift-fade-out 300ms ease both;pointer-events:none}@keyframes gift-fade-out{from{opacity:1}to{opacity:0}}',
           }}
         />
       </head>
