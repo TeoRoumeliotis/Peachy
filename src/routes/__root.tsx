@@ -60,7 +60,7 @@ export const Route = createRootRoute({
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var d=document.documentElement;d.classList.add("show-gift");d.classList.remove("gift-done","gift-leaving");function dismiss(){if(!d.classList.contains("show-gift")||d.classList.contains("gift-leaving"))return;d.classList.add("gift-leaving");setTimeout(function(){d.classList.remove("show-gift","gift-leaving");d.classList.add("gift-done");},300);}document.addEventListener("click",function(){if(d.classList.contains("show-gift"))dismiss();},true);function arm(){setTimeout(dismiss,7000);}if(document.readyState==="complete")arm();else window.addEventListener("load",arm);})();`,
+            __html: `(function(){var d=document.documentElement;d.classList.add("show-gift");d.classList.remove("gift-done","gift-leaving");function dismiss(){if(!d.classList.contains("show-gift")||d.classList.contains("gift-leaving"))return;d.classList.add("gift-leaving");setTimeout(function(){d.classList.remove("show-gift","gift-leaving");d.classList.add("gift-done");},300);}document.addEventListener("click",function(){if(d.classList.contains("show-gift"))dismiss();},true);function arm(){setTimeout(dismiss,4000);}if(document.readyState==="complete")arm();else window.addEventListener("load",arm);})();`,
           }}
         />
         <style
