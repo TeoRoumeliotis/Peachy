@@ -2,15 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { PeachMascot } from "@/components/peachy/mascot";
 import { t } from "@/lib/i18n";
 
-export const GIFT_FLAG = "peachy_first_gift_v2";
-
 type Props = {
   onDone: () => void;
 };
-
-function isGiftPreview(): boolean {
-  return new URLSearchParams(window.location.search).get("gift") === "1";
-}
 
 function markGiftLeaving() {
   document.documentElement.classList.add("gift-leaving");
@@ -31,13 +25,6 @@ export function GiftOverlay({ onDone }: Props) {
   function dismiss() {
     if (done.current) return;
     done.current = true;
-    if (!isGiftPreview()) {
-      try {
-        window.localStorage.setItem(GIFT_FLAG, "1");
-      } catch {
-        /* still dismiss */
-      }
-    }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       markGiftDone();
