@@ -1,0 +1,4 @@
+{
+  "installCommand": "npm install",
+  "buildCommand": "rm -rf .vercel && npx vite build"
+}
