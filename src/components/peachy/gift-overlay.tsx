@@ -44,7 +44,7 @@ export function GiftOverlay({ onDone }: Props) {
     if (!reduce) setIntro(true);
 
     const rest = window.setTimeout(() => setIntro(false), 1400);
-    const failSafe = window.setTimeout(dismiss, 7000);
+    const failSafe = window.setTimeout(dismiss, 4000);
     return () => {
       window.clearTimeout(rest);
       window.clearTimeout(failSafe);
