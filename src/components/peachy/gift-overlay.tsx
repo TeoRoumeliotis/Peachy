@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { PeachMascot } from "@/components/peachy/mascot";
 import { t } from "@/lib/i18n";
 
-export const GIFT_FLAG = "peachy_first_gift";
+export const GIFT_FLAG = "peachy_first_gift_v2";
 
 type Props = {
   onDone: () => void;
@@ -54,18 +54,14 @@ export function GiftOverlay({ onDone }: Props) {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduce) {
-      setIntro(true);
-      const rest = window.setTimeout(() => setIntro(false), 1400);
-      const failSafe = window.setTimeout(dismiss, 4000);
-      return () => {
-        window.clearTimeout(rest);
-        window.clearTimeout(failSafe);
-      };
-    }
-    const failSafe = window.setTimeout(dismiss, 4000);
-    return () => window.clearTimeout(failSafe);
-    // First HTML has no is-intro / is-leaving. Bounce + dismiss bind after paint.
+    if (!reduce) setIntro(true);
+
+    const rest = window.setTimeout(() => setIntro(false), 1400);
+    const failSafe = window.setTimeout(dismiss, 7000);
+    return () => {
+      window.clearTimeout(rest);
+      window.clearTimeout(failSafe);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
