@@ -1,0 +1,41 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Peachy",
+      "hasCanvas": false,
+      "bodyTextLen": 662,
+      "bodyTextHash": "9d85ab8d9d2e8e643e3ca70730ff9cee02acfa6df35202f5ee9d905b7ed25a66",
+      "bodyTextPrefix": "Σήμερα Βάλ’ το στην αρχική σου Άνοιξέ το από το Safari → κουμπί ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Peachy",
+      "hasCanvas": false,
+      "bodyTextLen": 662,
+      "bodyTextHash": "9d85ab8d9d2e8e643e3ca70730ff9cee02acfa6df35202f5ee9d905b7ed25a66",
+      "bodyTextPrefix": "Σήμερα Βάλ’ το στην αρχική σου Άνοιξέ το από το Safari → κουμπί ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: body text changed (290 -> 662 chars, hash mismatch)",
+    "mobile: body text changed (290 -> 662 chars, hash mismatch)"
+  ]
+}

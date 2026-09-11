@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Peachy",
+      "hasCanvas": false,
+      "bodyTextLen": 290,
+      "bodyTextHash": "6e3d48c5f23c2872c96a04925afe72e55073eed5090982134b2a00a77cc12531",
+      "bodyTextPrefix": "Σήμερα Σήμερα Παρασκευή 11 Σεπτεμβρίου Καλό απόγευμα Δήμητρα σήμ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Peachy",
+      "hasCanvas": false,
+      "bodyTextLen": 290,
+      "bodyTextHash": "6e3d48c5f23c2872c96a04925afe72e55073eed5090982134b2a00a77cc12531",
+      "bodyTextPrefix": "Σήμερα Σήμερα Παρασκευή 11 Σεπτεμβρίου Καλό απόγευμα Δήμητρα σήμ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
