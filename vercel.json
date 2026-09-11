@@ -1,4 +1,4 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "rm -rf .vercel && npx vite build"
+  "buildCommand": "rm -rf .vercel && npx vite build && node scripts/copy-tslib.mjs"
 }
