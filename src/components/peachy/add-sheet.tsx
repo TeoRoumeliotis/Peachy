@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Drawer } from "vaul";
-import { t, QUICK_ADDS } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { MEAL_ORDER, type Bite, type MealId } from "@/lib/types";
 import { emojiForName } from "@/lib/food-emoji";
+import { quickAddsFromDays } from "@/lib/quick-adds";
 import { cn } from "@/lib/cn";
+import { useDiary } from "@/store/diary";
 
 export type Draft = {
   meal: MealId;
@@ -39,6 +41,8 @@ export function AddSheet({
   onSave,
   onDelete,
 }: Props) {
+  const days = useDiary((s) => s.days);
+  const chips = useMemo(() => quickAddsFromDays(days), [days]);
   const [draft, setDraft] = useState<Draft>(emptyDraft(initialMeal ?? "snack", initialTime));
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -111,16 +115,18 @@ export function AddSheet({
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)]">
             <div className="quick-adds">
-              {QUICK_ADDS.map((chip) => (
+              {chips.map((chip) => (
                 <button
-                  key={chip.label}
+                  key={`${chip.personal ? "me" : "base"}:${chip.label}`}
                   type="button"
-                  className="chip"
+                  className={cn("chip", chip.personal && draft.name.trim() === chip.label && "chip-on")}
                   onClick={() =>
                     setDraft((d) => ({
                       ...d,
                       name: chip.label,
-                      emoji: emojiForName(chip.label),
+                      emoji: chip.emoji || emojiForName(chip.label),
+                      note: chip.personal ? chip.note : d.note,
+                      kcal: chip.personal ? chip.kcal : d.kcal,
                     }))
                   }
                 >
