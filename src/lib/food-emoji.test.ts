@@ -34,7 +34,7 @@ describe("emojiForName", () => {
       ["φρούτο", "🍎"],
       ["fruit", "🍎"],
       ["μήλο", "🍎"],
-      ["φράουλα", "🥤"],
+      ["φράουλα", "🍓"],
       ["smoothie", "🥤"],
       ["ροδάκινο", "🍑"],
       ["peach", "🍑"],
@@ -51,6 +51,12 @@ describe("emojiForName", () => {
       ["apple", "🍎"],
       ["πορτοκάλι", "🍊"],
       ["orange", "🍊"],
+      ["μέλι", "🍯"],
+      ["τσάι", "🍵"],
+      ["πίτσα", "🍕"],
+      ["τυρόπιτα", "🥠"],
+      ["παγωτό", "🍦"],
+      ["αβοκάντο", "🥑"],
     ];
     for (const [name, emoji] of cases) {
       assert.equal(emojiForName(name), emoji, name);
@@ -59,7 +65,6 @@ describe("emojiForName", () => {
 
   it("never defaults unknown food to a peach", () => {
     assert.equal(emojiForName("xyz"), "🍽️");
-    assert.equal(emojiForName("μέλι"), "🍽️");
     assert.equal(emojiForName(""), "🍽️");
     assert.notEqual(emojiForName("γάλα"), "🍑");
   });
