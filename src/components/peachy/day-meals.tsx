@@ -1,15 +1,16 @@
 import { t } from "@/lib/i18n";
-import { MEAL_ORDER, type Bite } from "@/lib/types";
+import { MEAL_ORDER, type Bite, type MealId } from "@/lib/types";
 import { sortBites } from "@/store/diary";
 import { cn } from "@/lib/cn";
 
 type Props = {
   bites: Bite[];
   onOpenBite: (bite: Bite) => void;
+  onAddMeal?: (meal: MealId) => void;
   justAddedId?: string | null;
 };
 
-export function DayMeals({ bites, onOpenBite, justAddedId }: Props) {
+export function DayMeals({ bites, onOpenBite, onAddMeal, justAddedId }: Props) {
   return (
     <div className="flex flex-col gap-3 px-5">
       {MEAL_ORDER.map((meal) => {
@@ -17,10 +18,23 @@ export function DayMeals({ bites, onOpenBite, justAddedId }: Props) {
         return (
           <section key={meal} className="meal-card">
             <header className="mb-2">
-              <h2 className="text-base font-semibold tracking-tight">{t.meals[meal]}</h2>
+              <button
+                type="button"
+                className="pressable -mx-1 rounded-md px-1 text-left"
+                onClick={() => onAddMeal?.(meal)}
+                aria-label={`${t.addBite}: ${t.meals[meal]}`}
+              >
+                <h2 className="text-base font-semibold tracking-tight">{t.meals[meal]}</h2>
+              </button>
             </header>
             {items.length === 0 ? (
-              <p className="py-2 text-sm leading-normal text-muted">{t.emptyMeal}</p>
+              <button
+                type="button"
+                className="pressable w-full rounded-md py-2 text-left text-sm leading-normal text-muted"
+                onClick={() => onAddMeal?.(meal)}
+              >
+                {t.emptyMeal}
+              </button>
             ) : (
               <ul className="flex flex-col">
                 {items.map((bite, i) => (
