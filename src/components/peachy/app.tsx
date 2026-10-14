@@ -252,6 +252,7 @@ export function PeachyApp() {
                   bites={days[today] ?? []}
                   mood={mood}
                   onOpenBite={(bite) => openEdit(bite, today)}
+                  onAddMeal={(meal) => openNew(meal, today)}
                   justAddedId={justAddedId}
                 />
               </div>
@@ -266,6 +267,7 @@ export function PeachyApp() {
                   onSelect={setCalDate}
                   days={days}
                   onOpenBite={(bite) => openEdit(bite, calDate)}
+                  onAddMeal={(meal) => openNew(meal, calDate)}
                 />
               </div>
             )}
