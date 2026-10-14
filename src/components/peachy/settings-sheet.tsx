@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Drawer } from "vaul";
 import { t } from "@/lib/i18n";
 
@@ -8,8 +8,12 @@ type Props = {
   container: HTMLElement | null;
   displayName: string;
   onDisplayName: (name: string) => void;
+  onExport: () => void;
+  onImportFile: (file: File) => void;
   onReset: () => void;
 };
+
+type Confirm = "export" | "import" | null;
 
 export function SettingsSheet({
   open,
@@ -17,16 +21,31 @@ export function SettingsSheet({
   container,
   displayName,
   onDisplayName,
+  onExport,
+  onImportFile,
   onReset,
 }: Props) {
   const [name, setName] = useState(displayName);
   const [resetStep, setResetStep] = useState(0);
+  const [confirm, setConfirm] = useState<Confirm>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
     setName(displayName);
     setResetStep(0);
+    setConfirm(null);
   }, [open, displayName]);
+
+  function confirmExport() {
+    setConfirm(null);
+    onExport();
+  }
+
+  function confirmImport() {
+    setConfirm(null);
+    fileRef.current?.click();
+  }
 
   return (
     <Drawer.Root
@@ -61,6 +80,63 @@ export function SettingsSheet({
             />
 
             <div className="mt-6">
+              <p className="text-sm font-semibold">{t.backupTitle}</p>
+              <p className="mt-1 text-sm leading-5 text-muted">{t.backupHint}</p>
+
+              {confirm === "export" ? (
+                <div className="confirm-row mt-3">
+                  <span className="text-sm">{t.exportConfirm}</span>
+                  <span className="flex">
+                    <button type="button" className="ghost-btn" onClick={() => setConfirm(null)}>
+                      {t.cancel}
+                    </button>
+                    <button type="button" className="ghost-btn" onClick={confirmExport}>
+                      {t.exportYes}
+                    </button>
+                  </span>
+                </div>
+              ) : (
+                <button type="button" className="primary-btn mt-3" onClick={() => setConfirm("export")}>
+                  {t.exportBackup}
+                </button>
+              )}
+
+              {confirm === "import" ? (
+                <div className="confirm-row mt-2">
+                  <span className="text-sm">{t.importConfirm}</span>
+                  <span className="flex">
+                    <button type="button" className="ghost-btn" onClick={() => setConfirm(null)}>
+                      {t.cancel}
+                    </button>
+                    <button type="button" className="ghost-btn" onClick={confirmImport}>
+                      {t.importYes}
+                    </button>
+                  </span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="pressable mt-2 min-h-[52px] w-full rounded-[16px] border border-[color:color-mix(in_oklab,var(--color-peach)_50%,transparent)] bg-card text-[1.0625rem] font-semibold"
+                  onClick={() => setConfirm("import")}
+                >
+                  {t.importBackup}
+                </button>
+              )}
+
+              <input
+                ref={fileRef}
+                type="file"
+                accept="application/json,.json"
+                className="sr-only"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (file) onImportFile(file);
+                }}
+              />
+            </div>
+
+            <div className="mt-4">
               {resetStep === 0 ? (
                 <button
                   type="button"
