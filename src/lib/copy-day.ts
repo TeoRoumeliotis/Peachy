@@ -1,6 +1,9 @@
+import { addDays } from "./dates";
 import { t } from "./i18n";
 import { formatGreekDate } from "./dates";
 import { MEAL_ORDER, type Bite, type MealId } from "./types";
+
+export const MAX_COPY_DAYS = 31;
 
 export function copyDayText(ymd: string, bites: Bite[]): string {
   const lines: string[] = [formatGreekDate(ymd), ""];
@@ -24,4 +27,30 @@ export function copyDayText(ymd: string, bites: Bite[]): string {
   }
   if (!any) lines.push(t.emptyMeal);
   return lines.join("\n").trim() + "\n";
+}
+
+/** Inclusive range, swapped if needed, capped at 31 days. Empty days are omitted. */
+export function copyRangeText(
+  fromYmd: string,
+  toYmd: string,
+  days: Record<string, Bite[]>,
+): string {
+  let from = fromYmd;
+  let to = toYmd;
+  if (from > to) [from, to] = [to, from];
+
+  const lines: string[] = [];
+  let cursor = from;
+  let count = 0;
+  while (cursor <= to && count < MAX_COPY_DAYS) {
+    const bites = days[cursor] ?? [];
+    if (bites.length > 0) {
+      lines.push(copyDayText(cursor, bites).trimEnd());
+      lines.push("");
+    }
+    cursor = addDays(cursor, 1);
+    count += 1;
+  }
+  if (lines.length === 0) return `${t.copyRangeEmpty}\n`;
+  return `${lines.join("\n").trim()}\n`;
 }
