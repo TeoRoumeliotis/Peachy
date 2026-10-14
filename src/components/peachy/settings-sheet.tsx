@@ -9,6 +9,7 @@ type Props = {
   displayName: string;
   onDisplayName: (name: string) => void;
   onCopyToday: () => void;
+  onCopyRange: () => void;
   onReset: () => void;
 };
 
@@ -19,6 +20,7 @@ export function SettingsSheet({
   displayName,
   onDisplayName,
   onCopyToday,
+  onCopyRange,
   onReset,
 }: Props) {
   const [name, setName] = useState(displayName);
@@ -64,6 +66,13 @@ export function SettingsSheet({
 
             <button type="button" className="primary-btn mt-6" onClick={onCopyToday}>
               {t.copyToday}
+            </button>
+            <button
+              type="button"
+              className="pressable mt-2 min-h-[52px] w-full rounded-[16px] border border-[color:color-mix(in_oklab,var(--color-peach)_50%,transparent)] bg-card text-[1.0625rem] font-semibold"
+              onClick={onCopyRange}
+            >
+              {t.copyDays}
             </button>
 
             <div className="mt-4">
