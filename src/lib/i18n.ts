@@ -9,11 +9,11 @@ export const t = {
   settings: "Ρυθμίσεις",
   newBite: "Νέα μπουκιά",
   editBite: "Μπουκιά",
-  defaultName: "Δήμητρα",
+  defaultName: "",
   greetingMorning: "Καλημέρα",
   greetingAfternoon: "Καλό απόγευμα",
   greetingEvening: "Καλό βράδυ",
-  firstOpenCaption: "Καλημέρα Δήμητρα",
+  firstOpenCaption: "Καλημέρα",
   meals: {
     breakfast: "Πρωινό",
     lunch: "Μεσημεριανό",
@@ -44,7 +44,7 @@ export const t = {
   resetConfirm1: "Να τα σβήσω όλα;",
   resetConfirm2: "Σίγουρα; Δεν γυρίζει πίσω.",
   resetFinal: "Ναι, όλα",
-  dedication: "φτιάχτηκε για τη Δήμητρα",
+  dedication: "",
   close: "Κλείσιμο",
   prevMonth: "Προηγούμενος μήνας",
   nextMonth: "Επόμενος μήνας",
@@ -81,7 +81,9 @@ export function greetWord(hour: number): string {
 }
 
 export function greetLine(name: string, hour: number): string {
-  return `${greetWord(hour)} ${name}`;
+  const word = greetWord(hour);
+  const clean = name.trim();
+  return clean ? `${word} ${clean}` : word;
 }
 
 export function todayKcalLine(total: number): string {
