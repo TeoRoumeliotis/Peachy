@@ -6,6 +6,7 @@ import { GiftOverlay } from "@/components/peachy/gift-overlay";
 import { RangeCopySheet } from "@/components/peachy/range-copy-sheet";
 import { SettingsSheet } from "@/components/peachy/settings-sheet";
 import { TodayView } from "@/components/peachy/today-view";
+import { buildBackup, downloadBackup, parseBackup } from "@/lib/backup";
 import { cn } from "@/lib/cn";
 import { copyDayText, copyRangeText } from "@/lib/copy-day";
 import { defaultMeal, formatNowTime, toYmd } from "@/lib/dates";
@@ -46,6 +47,7 @@ export function PeachyApp() {
   const updateBite = useDiary((s) => s.updateBite);
   const deleteBite = useDiary((s) => s.deleteBite);
   const resetAll = useDiary((s) => s.resetAll);
+  const importDiary = useDiary((s) => s.importDiary);
   const setDisplayName = useDiary((s) => s.setDisplayName);
   const markGreeting = useDiary((s) => s.markGreeting);
 
@@ -222,6 +224,32 @@ export function PeachyApp() {
     ping(t.copied);
   }
 
+  function exportBackup() {
+    const state = useDiary.getState();
+    downloadBackup(
+      buildBackup({
+        version: 1,
+        initialized: true,
+        settings: state.settings,
+        days: state.days,
+      }),
+    );
+    setSettingsOpen(false);
+    ping(t.exportDone);
+  }
+
+  async function importBackupFile(file: File) {
+    const raw = await file.text();
+    const diary = parseBackup(raw);
+    if (!diary) {
+      ping(t.backupInvalid);
+      return;
+    }
+    importDiary(diary);
+    setSettingsOpen(false);
+    ping(t.importDone);
+  }
+
   function changeTab(next: TabId) {
     if (next === tab) return;
     setTabDir(next === "calendar" ? "right" : "left");
@@ -339,6 +367,10 @@ export function PeachyApp() {
           container={container}
           displayName={settings.displayName}
           onDisplayName={setDisplayName}
+          onExport={exportBackup}
+          onImportFile={(file) => {
+            void importBackupFile(file);
+          }}
           onReset={() => {
             resetAll();
             setSettingsOpen(false);
