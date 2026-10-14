@@ -222,6 +222,11 @@ export function PeachyApp() {
     ping(t.copied);
   }
 
+  function openRangeCopy() {
+    setSettingsOpen(false);
+    window.setTimeout(() => setRangeOpen(true), 280);
+  }
+
   function changeTab(next: TabId) {
     if (next === tab) return;
     setTabDir(next === "calendar" ? "right" : "left");
@@ -339,10 +344,7 @@ export function PeachyApp() {
             void copyToday();
             setSettingsOpen(false);
           }}
-          onCopyRange={() => {
-            setSettingsOpen(false);
-            setRangeOpen(true);
-          }}
+          onCopyRange={openRangeCopy}
           onReset={() => {
             resetAll();
             setSettingsOpen(false);
