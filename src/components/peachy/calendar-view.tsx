@@ -170,7 +170,8 @@ export function CalendarView({
               <ChevronRight size={20} />
             </button>
           </div>
-          <div className="mt-2 flex justify-center gap-2">
+          <p className="mt-3 text-center text-xs font-medium tracking-wide text-muted">{t.copyRange}</p>
+          <div className="mt-1.5 flex justify-center gap-2">
             <button type="button" className="copy-chip pressable" onClick={onCopyDay}>
               {t.copyThisDay}
             </button>
