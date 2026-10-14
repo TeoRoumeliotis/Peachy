@@ -24,6 +24,8 @@ type Props = {
   days: Record<string, Bite[]>;
   onOpenBite: (bite: Bite) => void;
   onAddMeal?: (meal: MealId) => void;
+  onCopyDay?: () => void;
+  onCopyRange?: () => void;
 };
 
 function monthCells(month: Date): (string | null)[] {
@@ -52,6 +54,8 @@ export function CalendarView({
   days,
   onOpenBite,
   onAddMeal,
+  onCopyDay,
+  onCopyRange,
 }: Props) {
   const selectedDate = parseYmd(selected);
   const month = startOfMonth(selectedDate);
@@ -149,21 +153,31 @@ export function CalendarView({
           shiftDay(dx < 0 ? 1 : -1);
         }}
       >
-        <div className="mb-3 flex items-center justify-between px-5">
-          <button type="button" className="icon-btn" aria-label={t.prevDay} onClick={() => shiftDay(-1)}>
-            <ChevronLeft size={20} />
-          </button>
-          <div className="text-center">
-            <p className="font-semibold tracking-tight">{formatGreekDate(selected)}</p>
-            {total != null ? (
-              <p className="kcal-soft mt-0.5">
-                {t.kcalDayPrefix} <CountUp value={total} /> kcal
-              </p>
-            ) : null}
+        <div className="mb-3 px-5">
+          <div className="flex items-center justify-between">
+            <button type="button" className="icon-btn" aria-label={t.prevDay} onClick={() => shiftDay(-1)}>
+              <ChevronLeft size={20} />
+            </button>
+            <div className="text-center">
+              <p className="font-semibold tracking-tight">{formatGreekDate(selected)}</p>
+              {total != null ? (
+                <p className="kcal-soft mt-0.5">
+                  {t.kcalDayPrefix} <CountUp value={total} /> kcal
+                </p>
+              ) : null}
+            </div>
+            <button type="button" className="icon-btn" aria-label={t.nextDay} onClick={() => shiftDay(1)}>
+              <ChevronRight size={20} />
+            </button>
           </div>
-          <button type="button" className="icon-btn" aria-label={t.nextDay} onClick={() => shiftDay(1)}>
-            <ChevronRight size={20} />
-          </button>
+          <div className="mt-2 flex justify-center gap-2">
+            <button type="button" className="copy-chip pressable" onClick={onCopyDay}>
+              {t.copyThisDay}
+            </button>
+            <button type="button" className="copy-chip pressable" onClick={onCopyRange}>
+              {t.copyDaysShort}
+            </button>
+          </div>
         </div>
         <DayMeals bites={bites} onOpenBite={onOpenBite} onAddMeal={onAddMeal} />
       </div>
