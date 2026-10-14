@@ -15,7 +15,7 @@ import { cn } from "@/lib/cn";
 import { CountUp } from "@/components/peachy/count-up";
 import { DayMeals } from "@/components/peachy/day-meals";
 import { kcalTotal } from "@/store/diary";
-import type { Bite } from "@/lib/types";
+import type { Bite, MealId } from "@/lib/types";
 
 type Props = {
   today: string;
@@ -23,6 +23,7 @@ type Props = {
   onSelect: (ymd: string) => void;
   days: Record<string, Bite[]>;
   onOpenBite: (bite: Bite) => void;
+  onAddMeal?: (meal: MealId) => void;
 };
 
 function monthCells(month: Date): (string | null)[] {
@@ -50,6 +51,7 @@ export function CalendarView({
   onSelect,
   days,
   onOpenBite,
+  onAddMeal,
 }: Props) {
   const selectedDate = parseYmd(selected);
   const month = startOfMonth(selectedDate);
@@ -163,7 +165,7 @@ export function CalendarView({
             <ChevronRight size={20} />
           </button>
         </div>
-        <DayMeals bites={bites} onOpenBite={onOpenBite} />
+        <DayMeals bites={bites} onOpenBite={onOpenBite} onAddMeal={onAddMeal} />
       </div>
     </div>
   );
