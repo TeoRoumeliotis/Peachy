@@ -45,7 +45,7 @@ export function AddSheet({
   const chips = useMemo(() => quickAddsFromDays(days), [days]);
   const [draft, setDraft] = useState<Draft>(emptyDraft(initialMeal ?? "snack", initialTime));
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const sheetRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -62,46 +62,40 @@ export function AddSheet({
     } else {
       setDraft(emptyDraft(initialMeal ?? "snack", initialTime));
     }
-    // Seed only when the sheet opens so time ticks / chip taps don't wipe note, kcal, time.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open is the session gate
   }, [open]);
 
-  // Keep the sheet sitting above the iOS keyboard instead of letting Safari scroll the page.
+  // Lock the visual viewport so Android/iOS don't scroll the whole page when the keyboard opens.
   useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
     if (!vv) return;
 
-    const update = () => {
-      const el = sheetRef.current;
-      if (!el) return;
-      const keyboard = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      el.style.bottom = `${keyboard}px`;
-      // Also keep focused input visible inside the scroll area.
-      const active = document.activeElement as HTMLElement | null;
-      if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) {
-        active.scrollIntoView({ block: "center", behavior: "smooth" });
+    const lock = () => {
+      if (vv.offsetTop !== 0 || window.scrollY !== 0) {
+        window.scrollTo(0, 0);
       }
     };
 
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    update();
-
+    vv.addEventListener("scroll", lock);
+    window.addEventListener("scroll", lock);
     return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-      if (sheetRef.current) sheetRef.current.style.bottom = "0px";
+      vv.removeEventListener("scroll", lock);
+      window.removeEventListener("scroll", lock);
     };
   }, [open]);
 
   const canSave = draft.name.trim().length > 0;
 
   const keepVisible = (e: React.FocusEvent<HTMLInputElement>) => {
-    // Small delay so the keyboard has started opening.
+    const input = e.target;
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    // Scroll only inside the sheet so the field stays in view without jumping the page.
     setTimeout(() => {
-      e.target.scrollIntoView({ block: "center", behavior: "smooth" });
-    }, 120);
+      const top = input.offsetTop - scroller.offsetTop - 12;
+      scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }, 80);
   };
 
   return (
@@ -115,11 +109,7 @@ export function AddSheet({
     >
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
-        <Drawer.Content
-          ref={sheetRef}
-          className="sheet-content"
-          aria-describedby={undefined}
-        >
+        <Drawer.Content className="sheet-content" aria-describedby={undefined}>
           <Drawer.Handle className="sheet-handle" />
           <Drawer.Description className="sr-only">{t.appName}</Drawer.Description>
           <div className="flex items-center justify-between px-5 pb-2 pt-1">
@@ -140,7 +130,11 @@ export function AddSheet({
               </button>
             ))}
           </div>
-          <div className="px-5 pb-2">
+
+          <div
+            ref={scrollRef}
+            className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)]"
+          >
             <label className="block text-sm font-medium text-muted">{t.whatAte}</label>
             <input
               className="field mt-1.5"
@@ -154,9 +148,8 @@ export function AddSheet({
               autoCapitalize="sentences"
               enterKeyHint="done"
             />
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)]">
-            <div className="quick-adds">
+
+            <div className="quick-adds mt-4">
               {chips.map((chip) => (
                 <button
                   key={`${chip.personal ? "me" : "base"}:${chip.label}`}
