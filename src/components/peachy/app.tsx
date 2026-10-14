@@ -201,8 +201,8 @@ export function PeachyApp() {
     ping(t.deleted);
   }
 
-  async function copyToday() {
-    const text = copyDayText(today, days[today] ?? []);
+  async function copySelectedDay() {
+    const text = copyDayText(calDate, days[calDate] ?? []);
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -220,11 +220,6 @@ export function PeachyApp() {
     }
     setRangeOpen(false);
     ping(t.copied);
-  }
-
-  function openRangeCopy() {
-    setSettingsOpen(false);
-    window.setTimeout(() => setRangeOpen(true), 280);
   }
 
   function changeTab(next: TabId) {
@@ -286,6 +281,10 @@ export function PeachyApp() {
                   days={days}
                   onOpenBite={(bite) => openEdit(bite, calDate)}
                   onAddMeal={(meal) => openNew(meal, calDate)}
+                  onCopyDay={() => {
+                    void copySelectedDay();
+                  }}
+                  onCopyRange={() => setRangeOpen(true)}
                 />
               </div>
             )}
@@ -340,11 +339,6 @@ export function PeachyApp() {
           container={container}
           displayName={settings.displayName}
           onDisplayName={setDisplayName}
-          onCopyToday={() => {
-            void copyToday();
-            setSettingsOpen(false);
-          }}
-          onCopyRange={openRangeCopy}
           onReset={() => {
             resetAll();
             setSettingsOpen(false);
