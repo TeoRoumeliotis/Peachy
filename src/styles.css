@@ -586,6 +586,17 @@
   scale: 1;
 }
 
+.copy-chip {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-peach) 45%, transparent);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 .ghost-btn {
   min-height: 44px;
   border: 0;
