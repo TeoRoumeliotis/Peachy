@@ -4,7 +4,7 @@ import { CountUp } from "@/components/peachy/count-up";
 import { DayMeals } from "@/components/peachy/day-meals";
 import { PeachMascot } from "@/components/peachy/mascot";
 import { kcalTotal } from "@/store/diary";
-import type { Bite, MascotMood } from "@/lib/types";
+import type { Bite, MascotMood, MealId } from "@/lib/types";
 
 type Props = {
   today: string;
@@ -13,6 +13,7 @@ type Props = {
   bites: Bite[];
   mood: MascotMood;
   onOpenBite: (bite: Bite) => void;
+  onAddMeal?: (meal: MealId) => void;
   justAddedId?: string | null;
 };
 
@@ -23,6 +24,7 @@ export function TodayView({
   bites,
   mood,
   onOpenBite,
+  onAddMeal,
   justAddedId,
 }: Props) {
   const total = kcalTotal(bites);
@@ -47,6 +49,7 @@ export function TodayView({
       <DayMeals
         bites={bites}
         onOpenBite={onOpenBite}
+        onAddMeal={onAddMeal}
         justAddedId={justAddedId}
       />
     </div>
