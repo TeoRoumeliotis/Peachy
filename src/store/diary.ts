@@ -14,6 +14,7 @@ type DiaryStore = PersistedDiary & {
   updateBite: (date: string, id: string, patch: Partial<Bite>) => void;
   deleteBite: (date: string, id: string) => void;
   resetAll: () => void;
+  importDiary: (diary: PersistedDiary) => void;
   setDisplayName: (name: string) => void;
   markGreeting: (date: string) => void;
 };
@@ -153,6 +154,18 @@ export const useDiary = create<DiaryStore>((set, get) => ({
     set({
       initialized: true,
       days: {},
+    });
+    write(get());
+  },
+
+  importDiary: (diary) => {
+    set({
+      initialized: true,
+      settings: {
+        displayName: diary.settings.displayName?.trim() ?? "",
+        lastGreetingDate: diary.settings.lastGreetingDate ?? "",
+      },
+      days: applyFoodEmojis(diary.days),
     });
     write(get());
   },
