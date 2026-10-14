@@ -3,10 +3,11 @@ import { CalendarDays, House, Plus, Settings } from "lucide-react";
 import { AddSheet, type Draft } from "@/components/peachy/add-sheet";
 import { CalendarView } from "@/components/peachy/calendar-view";
 import { GiftOverlay } from "@/components/peachy/gift-overlay";
+import { RangeCopySheet } from "@/components/peachy/range-copy-sheet";
 import { SettingsSheet } from "@/components/peachy/settings-sheet";
 import { TodayView } from "@/components/peachy/today-view";
 import { cn } from "@/lib/cn";
-import { copyDayText } from "@/lib/copy-day";
+import { copyDayText, copyRangeText } from "@/lib/copy-day";
 import { defaultMeal, formatNowTime, toYmd } from "@/lib/dates";
 import { emojiForName } from "@/lib/food-emoji";
 import { t } from "@/lib/i18n";
@@ -54,6 +55,7 @@ export function PeachyApp() {
   const [compact, setCompact] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [rangeOpen, setRangeOpen] = useState(false);
   const [editing, setEditing] = useState<Bite | null>(null);
   const [sheetDate, setSheetDate] = useState("");
   const [sheetMeal, setSheetMeal] = useState<MealId>("snack");
@@ -209,6 +211,17 @@ export function PeachyApp() {
     ping(t.copied);
   }
 
+  async function copyRange(from: string, to: string) {
+    const text = copyRangeText(from, to, days);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      /* still acknowledge */
+    }
+    setRangeOpen(false);
+    ping(t.copied);
+  }
+
   function changeTab(next: TabId) {
     if (next === tab) return;
     setTabDir(next === "calendar" ? "right" : "left");
@@ -326,10 +339,24 @@ export function PeachyApp() {
             void copyToday();
             setSettingsOpen(false);
           }}
+          onCopyRange={() => {
+            setSettingsOpen(false);
+            setRangeOpen(true);
+          }}
           onReset={() => {
             resetAll();
             setSettingsOpen(false);
             ping(t.resetDone);
+          }}
+        />
+
+        <RangeCopySheet
+          open={rangeOpen}
+          onOpenChange={setRangeOpen}
+          container={container}
+          today={today}
+          onCopy={(from, to) => {
+            void copyRange(from, to);
           }}
         />
       </div>
