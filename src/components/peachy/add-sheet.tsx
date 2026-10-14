@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Drawer } from "vaul";
 import { t } from "@/lib/i18n";
 import { MEAL_ORDER, type Bite, type MealId } from "@/lib/types";
@@ -45,6 +45,7 @@ export function AddSheet({
   const chips = useMemo(() => quickAddsFromDays(days), [days]);
   const [draft, setDraft] = useState<Draft>(emptyDraft(initialMeal ?? "snack", initialTime));
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -65,7 +66,43 @@ export function AddSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open is the session gate
   }, [open]);
 
+  // Keep the sheet sitting above the iOS keyboard instead of letting Safari scroll the page.
+  useEffect(() => {
+    if (!open) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const update = () => {
+      const el = sheetRef.current;
+      if (!el) return;
+      const keyboard = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      el.style.bottom = `${keyboard}px`;
+      // Also keep focused input visible inside the scroll area.
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) {
+        active.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    };
+
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    update();
+
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+      if (sheetRef.current) sheetRef.current.style.bottom = "0px";
+    };
+  }, [open]);
+
   const canSave = draft.name.trim().length > 0;
+
+  const keepVisible = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Small delay so the keyboard has started opening.
+    setTimeout(() => {
+      e.target.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 120);
+  };
 
   return (
     <Drawer.Root
@@ -74,11 +111,15 @@ export function AddSheet({
       container={container ?? undefined}
       shouldScaleBackground={false}
       noBodyStyles
-      repositionInputs
+      repositionInputs={false}
     >
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
-        <Drawer.Content className="sheet-content" aria-describedby={undefined}>
+        <Drawer.Content
+          ref={sheetRef}
+          className="sheet-content"
+          aria-describedby={undefined}
+        >
           <Drawer.Handle className="sheet-handle" />
           <Drawer.Description className="sr-only">{t.appName}</Drawer.Description>
           <div className="flex items-center justify-between px-5 pb-2 pt-1">
@@ -108,6 +149,7 @@ export function AddSheet({
                 const name = e.target.value;
                 setDraft((d) => ({ ...d, name, emoji: emojiForName(name) }));
               }}
+              onFocus={keepVisible}
               placeholder={t.whatAtePlaceholder}
               autoCapitalize="sentences"
               enterKeyHint="done"
@@ -141,6 +183,7 @@ export function AddSheet({
               className="field mt-1.5"
               value={draft.note}
               onChange={(e) => setDraft((d) => ({ ...d, note: e.target.value }))}
+              onFocus={keepVisible}
               placeholder={t.notePlaceholder}
             />
 
@@ -156,6 +199,7 @@ export function AddSheet({
                     onChange={(e) =>
                       setDraft((d) => ({ ...d, kcal: e.target.value.replace(/[^\d]/g, "") }))
                     }
+                    onFocus={keepVisible}
                     placeholder="—"
                   />
                   <span className="pointer-events-none absolute inset-y-0 right-3 grid place-items-center text-sm text-muted">
@@ -170,6 +214,7 @@ export function AddSheet({
                   type="time"
                   value={draft.time}
                   onChange={(e) => setDraft((d) => ({ ...d, time: e.target.value }))}
+                  onFocus={keepVisible}
                 />
               </div>
             </div>
