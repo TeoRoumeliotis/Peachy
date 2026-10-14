@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { addDays, formatNowTime, toYmd } from "@/lib/dates";
+import { formatNowTime, toYmd } from "@/lib/dates";
 import { applyFoodEmojis } from "@/lib/food-emoji";
 import { t } from "@/lib/i18n";
 import type { Bite, MealId, PersistedDiary, Settings } from "@/lib/types";
@@ -32,91 +32,6 @@ function defaultSettings(): Settings {
   };
 }
 
-function seedBites(today: string): Record<string, Bite[]> {
-  const yesterday = addDays(today, -1);
-  const twoAgo = addDays(today, -2);
-  return {
-    [today]: [
-      {
-        id: "seed-today-coffee",
-        meal: "breakfast",
-        name: "Ελληνικός",
-        emoji: "☕",
-        note: "σκέτος, όπως πάντα",
-        kcal: null,
-        time: "08:12",
-      },
-      {
-        id: "seed-today-chicken",
-        meal: "lunch",
-        name: "Κοτόπουλο με σαλάτα",
-        emoji: "🍗",
-        note: "με λεμόνι",
-        kcal: 520,
-        time: "13:40",
-      },
-      {
-        id: "seed-today-yogurt",
-        meal: "snack",
-        name: "Γιαούρτι με μέλι",
-        emoji: "🥛",
-        note: "",
-        kcal: 180,
-        time: "16:20",
-      },
-    ],
-    [yesterday]: [
-      {
-        id: "seed-yday-smoothie",
-        meal: "breakfast",
-        name: "Smoothie φράουλα",
-        emoji: "🥤",
-        note: "",
-        kcal: 220,
-        time: "09:00",
-      },
-      {
-        id: "seed-yday-pasta",
-        meal: "lunch",
-        name: "Ζυμαρικά",
-        emoji: "🍝",
-        note: "σπιτικά",
-        kcal: null,
-        time: "14:10",
-      },
-      {
-        id: "seed-yday-choco",
-        meal: "snack",
-        name: "Σοκολάτα",
-        emoji: "🍫",
-        note: "",
-        kcal: 90,
-        time: "17:45",
-      },
-    ],
-    [twoAgo]: [
-      {
-        id: "seed-2ago-toast",
-        meal: "breakfast",
-        name: "Τοστ με αυγό",
-        emoji: "🥪",
-        note: "",
-        kcal: 340,
-        time: "08:40",
-      },
-      {
-        id: "seed-2ago-souvlaki",
-        meal: "dinner",
-        name: "Σουβλάκι",
-        emoji: "🥙",
-        note: "με πίτα",
-        kcal: null,
-        time: "21:05",
-      },
-    ],
-  };
-}
-
 function persistable(state: DiaryStore): PersistedDiary {
   return {
     version: 1,
@@ -144,7 +59,7 @@ function read(): PersistedDiary | null {
       version: 1,
       initialized: Boolean(parsed.initialized),
       settings: {
-        displayName: parsed.settings.displayName?.trim() || t.defaultName,
+        displayName: parsed.settings.displayName?.trim() ?? "",
         lastGreetingDate: parsed.settings.lastGreetingDate ?? "",
       },
       days: parsed.days,
@@ -175,7 +90,7 @@ export const useDiary = create<DiaryStore>((set, get) => ({
   hydrated: false,
   initialized: true,
   settings: defaultSettings(),
-  days: seedBites(toYmd(new Date())),
+  days: {},
 
   hydrate: () => {
     if (typeof window === "undefined") return;
@@ -243,7 +158,7 @@ export const useDiary = create<DiaryStore>((set, get) => ({
   },
 
   setDisplayName: (name) => {
-    const displayName = name.trim() || t.defaultName;
+    const displayName = name.trim();
     set((state) => ({ settings: { ...state.settings, displayName } }));
     write(get());
   },
