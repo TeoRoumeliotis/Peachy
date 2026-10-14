@@ -9,8 +9,8 @@ describe("emojiForName", () => {
       ["γάλα", "🥛"],
       ["γαλα", "🥛"],
       ["milk", "🥛"],
-      ["γιαούρτι", "🥛"],
-      ["yogurt", "🥛"],
+      ["γιαούρτι", "🥣"],
+      ["yogurt", "🥣"],
       ["καφές", "☕"],
       ["coffee", "☕"],
       ["ελληνικός", "☕"],
@@ -18,8 +18,8 @@ describe("emojiForName", () => {
       ["water", "💧"],
       ["τοστ", "🥪"],
       ["toast", "🥪"],
-      ["αυγά", "🍳"],
-      ["eggs", "🍳"],
+      ["αυγά", "🥚"],
+      ["eggs", "🥚"],
       ["σαλάτα", "🥗"],
       ["salad", "🥗"],
       ["κοτόπουλο", "🍗"],
@@ -44,8 +44,8 @@ describe("emojiForName", () => {
       ["cheese", "🧀"],
       ["κράκερ", "🍘"],
       ["cracker", "🍘"],
-      ["αυγό", "🍳"],
-      ["egg", "🍳"],
+      ["αυγό", "🥚"],
+      ["egg", "🥚"],
       ["ψωμί", "🍞"],
       ["bread", "🍞"],
       ["apple", "🍎"],
@@ -99,7 +99,7 @@ describe("applyFoodEmojis", () => {
     };
     const next = applyFoodEmojis(days);
     assert.equal(next["2026-09-11"]![0]!.emoji, "🥛");
-    assert.equal(next["2026-09-11"]![1]!.emoji, "🍳");
+    assert.equal(next["2026-09-11"]![1]!.emoji, "🥚");
     assert.equal(next["2026-09-11"]![2]!.emoji, "🍌");
   });
 });
