@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Drawer } from "vaul";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/cn";
 
 type Props = {
   open: boolean;
@@ -60,6 +59,7 @@ export function SettingsSheet({
                   (e.target as HTMLInputElement).blur();
                 }
               }}
+              placeholder="το όνομά σου"
             />
 
             <button type="button" className="primary-btn mt-6" onClick={onCopyToday}>
@@ -112,8 +112,6 @@ export function SettingsSheet({
                 </div>
               )}
             </div>
-
-            <p className={cn("mt-8 text-center text-xs tracking-wide text-muted")}>{t.dedication}</p>
           </div>
         </Drawer.Content>
       </Drawer.Portal>
