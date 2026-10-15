@@ -73,6 +73,12 @@ export function PeachyApp() {
   const sheetLock = useRef(false);
   const sheetLockTimer = useRef<number | null>(null);
 
+  // Android back-button virtual history. We push a marker when a sheet opens
+  // or when the user switches to the calendar tab. On popstate we close the
+  // topmost layer. Only the root (Today + nothing open) lets the app exit.
+  const historyDepth = useRef(0);
+  const ignoringPop = useRef(false);
+
   const today = toYmd(now);
   const hour = now.getHours();
   const [calDate, setCalDate] = useState(today);
@@ -133,6 +139,54 @@ export function PeachyApp() {
     if (!busy.current) setMood(idleMood);
   }, [idleMood]);
 
+  // --- Android back button -------------------------------------------------
+  function pushLayer() {
+    if (typeof window === "undefined") return;
+    history.pushState({ peachy: historyDepth.current + 1 }, "");
+    historyDepth.current += 1;
+  }
+
+  function popLayer() {
+    if (typeof window === "undefined" || historyDepth.current <= 0) return;
+    ignoringPop.current = true;
+    history.back();
+    historyDepth.current -= 1;
+    // Clear the flag after the popstate has been processed.
+    window.setTimeout(() => {
+      ignoringPop.current = false;
+    }, 50);
+  }
+
+  useEffect(() => {
+    function onPop() {
+      if (ignoringPop.current) return;
+      historyDepth.current = Math.max(0, historyDepth.current - 1);
+
+      if (sheetOpen) {
+        setSheetOpen(false);
+        setEditing(null);
+        return;
+      }
+      if (settingsOpen) {
+        setSettingsOpen(false);
+        return;
+      }
+      if (rangeOpen) {
+        setRangeOpen(false);
+        return;
+      }
+      if (tab === "calendar") {
+        setTab("today");
+        setTabDir("left");
+        return;
+      }
+      // Root state: let the browser exit the PWA.
+    }
+
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [sheetOpen, settingsOpen, rangeOpen, tab]);
+
   function ping(message: string) {
     setToast(message);
     if (toastTimer.current) window.clearTimeout(toastTimer.current);
@@ -141,6 +195,7 @@ export function PeachyApp() {
 
   function dismissSheet() {
     sheetLock.current = true;
+    if (sheetOpen) popLayer();
     setSheetOpen(false);
     setEditing(null);
     if (sheetLockTimer.current) window.clearTimeout(sheetLockTimer.current);
@@ -152,9 +207,11 @@ export function PeachyApp() {
   function handleSheetOpenChange(next: boolean) {
     if (next) {
       if (sheetLock.current) return;
+      pushLayer();
       setSheetOpen(true);
       return;
     }
+    if (sheetOpen) popLayer();
     setSheetOpen(false);
   }
 
@@ -163,6 +220,7 @@ export function PeachyApp() {
     setEditing(null);
     setSheetDate(date ?? (tab === "calendar" ? calDate : today));
     setSheetMeal(meal ?? defaultMeal(hour));
+    pushLayer();
     setSheetOpen(true);
   }
 
@@ -171,6 +229,7 @@ export function PeachyApp() {
     setEditing(bite);
     setSheetDate(date);
     setSheetMeal(bite.meal);
+    pushLayer();
     setSheetOpen(true);
   }
 
@@ -252,6 +311,11 @@ export function PeachyApp() {
 
   function changeTab(next: TabId) {
     if (next === tab) return;
+    if (next === "calendar" && tab === "today") {
+      pushLayer();
+    } else if (next === "today" && tab === "calendar") {
+      popLayer();
+    }
     setTabDir(next === "calendar" ? "right" : "left");
     setTab(next);
     if (next === "calendar") playMascot("wink");
@@ -277,7 +341,10 @@ export function PeachyApp() {
               type="button"
               className="icon-btn"
               aria-label={t.settings}
-              onClick={() => setSettingsOpen(true)}
+              onClick={() => {
+                pushLayer();
+                setSettingsOpen(true);
+              }}
             >
               <Settings size={22} strokeWidth={1.8} />
             </button>
@@ -312,7 +379,10 @@ export function PeachyApp() {
                   onCopyDay={() => {
                     void copySelectedDay();
                   }}
-                  onCopyRange={() => setRangeOpen(true)}
+                  onCopyRange={() => {
+                    pushLayer();
+                    setRangeOpen(true);
+                  }}
                 />
               </div>
             )}
@@ -363,7 +433,15 @@ export function PeachyApp() {
 
         <SettingsSheet
           open={settingsOpen}
-          onOpenChange={setSettingsOpen}
+          onOpenChange={(next) => {
+            if (next) {
+              pushLayer();
+              setSettingsOpen(true);
+            } else {
+              if (settingsOpen) popLayer();
+              setSettingsOpen(false);
+            }
+          }}
           container={container}
           displayName={settings.displayName}
           onDisplayName={setDisplayName}
@@ -380,7 +458,15 @@ export function PeachyApp() {
 
         <RangeCopySheet
           open={rangeOpen}
-          onOpenChange={setRangeOpen}
+          onOpenChange={(next) => {
+            if (next) {
+              pushLayer();
+              setRangeOpen(true);
+            } else {
+              if (rangeOpen) popLayer();
+              setRangeOpen(false);
+            }
+          }}
           container={container}
           today={today}
           onCopy={(from, to) => {
