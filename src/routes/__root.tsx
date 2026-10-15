@@ -60,7 +60,7 @@ export const Route = createRootRoute({
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var d=document.documentElement;var seen=false;try{seen=localStorage.getItem("peachy_welcome")==="1";}catch(e){}if(seen){d.classList.add("gift-done");return;}d.classList.add("show-gift");d.classList.remove("gift-done","gift-leaving");function dismiss(){if(!d.classList.contains("show-gift")||d.classList.contains("gift-leaving"))return;d.classList.add("gift-leaving");try{localStorage.setItem("peachy_welcome","1");}catch(e){}setTimeout(function(){d.classList.remove("show-gift","gift-leaving");d.classList.add("gift-done");},300);}document.addEventListener("click",function(){if(d.classList.contains("show-gift"))dismiss();},true);function arm(){setTimeout(dismiss,4000);}if(document.readyState==="complete")arm();else window.addEventListener("load",arm);})();`,
+            __html: `(function(){var d=document.documentElement;d.classList.add("show-gift");d.classList.remove("gift-done","gift-leaving");function dismiss(){if(!d.classList.contains("show-gift")||d.classList.contains("gift-leaving"))return;d.classList.add("gift-leaving");setTimeout(function(){d.classList.remove("show-gift","gift-leaving");d.classList.add("gift-done");},300);}document.addEventListener("click",function(){if(d.classList.contains("show-gift"))dismiss();},true);function arm(){setTimeout(dismiss,4000);}if(document.readyState==="complete")arm();else window.addEventListener("load",arm);})();`,
           }}
         />
         <style
