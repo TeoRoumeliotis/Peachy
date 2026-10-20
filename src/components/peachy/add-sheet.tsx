@@ -65,7 +65,7 @@ export function AddSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open is the session gate
   }, [open]);
 
-  // Lock the visual viewport so Android/iOS don't scroll the whole page when the keyboard opens.
+  // Lock the page scroll and expand bottom padding so the keyboard never covers inputs.
   useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
@@ -77,11 +77,28 @@ export function AddSheet({
       }
     };
 
+    const pad = () => {
+      const keyboard = Math.max(0, window.innerHeight - vv.height);
+      if (scrollRef.current) {
+        scrollRef.current.style.paddingBottom = `${Math.max(24, keyboard + 24)}px`;
+      }
+    };
+
+    const onResize = () => {
+      lock();
+      pad();
+    };
+
     vv.addEventListener("scroll", lock);
     window.addEventListener("scroll", lock);
+    vv.addEventListener("resize", onResize);
+    pad();
+
     return () => {
       vv.removeEventListener("scroll", lock);
       window.removeEventListener("scroll", lock);
+      vv.removeEventListener("resize", onResize);
+      if (scrollRef.current) scrollRef.current.style.paddingBottom = "";
     };
   }, [open]);
 
@@ -91,11 +108,17 @@ export function AddSheet({
     const input = e.target;
     const scroller = scrollRef.current;
     if (!scroller) return;
-    // Scroll only inside the sheet so the field stays in view without jumping the page.
-    setTimeout(() => {
-      const top = input.offsetTop - scroller.offsetTop - 12;
-      scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    }, 80);
+    // Give the keyboard a moment to appear, then scroll the field into the visible area above it.
+    window.setTimeout(() => {
+      const vv = window.visualViewport;
+      const keyboard = vv ? Math.max(0, window.innerHeight - vv.height) : 0;
+      const inputRect = input.getBoundingClientRect();
+      const visibleBottom = window.innerHeight - keyboard - 16;
+      if (inputRect.bottom > visibleBottom) {
+        const delta = inputRect.bottom - visibleBottom + 8;
+        scroller.scrollBy({ top: delta, behavior: "smooth" });
+      }
+    }, 120);
   };
 
   return (
