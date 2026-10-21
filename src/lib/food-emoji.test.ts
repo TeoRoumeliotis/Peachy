@@ -57,6 +57,11 @@ describe("emojiForName", () => {
       ["τυρόπιτα", "🥠"],
       ["παγωτό", "🍦"],
       ["αβοκάντο", "🥑"],
+      ["μπισκότα", "🍪"],
+      ["μπισκότο", "🍪"],
+      ["cookie", "🍪"],
+      ["cookies", "🍪"],
+      ["γλυκό", "🧁"],
     ];
     for (const [name, emoji] of cases) {
       assert.equal(emojiForName(name), emoji, name);
