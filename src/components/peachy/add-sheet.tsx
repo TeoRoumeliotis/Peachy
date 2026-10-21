@@ -46,6 +46,7 @@ export function AddSheet({
   const [draft, setDraft] = useState<Draft>(emptyDraft(initialMeal ?? "snack", initialTime));
   const [confirmDelete, setConfirmDelete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const focusedInput = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -65,7 +66,7 @@ export function AddSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open is the session gate
   }, [open]);
 
-  // Lock the page scroll and expand bottom padding so the keyboard never covers inputs.
+  // Lock page scroll + aggressive bottom padding so keyboard never covers inputs on iOS.
   useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
@@ -77,22 +78,33 @@ export function AddSheet({
       }
     };
 
-    const pad = () => {
+    const padAndReveal = () => {
       const keyboard = Math.max(0, window.innerHeight - vv.height);
-      if (scrollRef.current) {
-        scrollRef.current.style.paddingBottom = `${Math.max(24, keyboard + 24)}px`;
+      const scroller = scrollRef.current;
+      if (scroller) {
+        scroller.style.paddingBottom = `${Math.max(40, keyboard + 40)}px`;
+      }
+      // If something is focused, re-scroll it into view after the keyboard settles.
+      const input = focusedInput.current;
+      if (input && scroller && keyboard > 50) {
+        const rect = input.getBoundingClientRect();
+        const visibleBottom = vv.height - 24;
+        if (rect.bottom > visibleBottom) {
+          const delta = rect.bottom - visibleBottom + 16;
+          scroller.scrollBy({ top: delta, behavior: "auto" });
+        }
       }
     };
 
     const onResize = () => {
       lock();
-      pad();
+      padAndReveal();
     };
 
     vv.addEventListener("scroll", lock);
     window.addEventListener("scroll", lock);
     vv.addEventListener("resize", onResize);
-    pad();
+    padAndReveal();
 
     return () => {
       vv.removeEventListener("scroll", lock);
@@ -106,19 +118,37 @@ export function AddSheet({
 
   const keepVisible = (e: React.FocusEvent<HTMLInputElement>) => {
     const input = e.target;
+    focusedInput.current = input;
     const scroller = scrollRef.current;
     if (!scroller) return;
-    // Give the keyboard a moment to appear, then scroll the field into the visible area above it.
-    window.setTimeout(() => {
-      const vv = window.visualViewport;
-      const keyboard = vv ? Math.max(0, window.innerHeight - vv.height) : 0;
-      const inputRect = input.getBoundingClientRect();
-      const visibleBottom = window.innerHeight - keyboard - 16;
-      if (inputRect.bottom > visibleBottom) {
-        const delta = inputRect.bottom - visibleBottom + 8;
-        scroller.scrollBy({ top: delta, behavior: "smooth" });
-      }
-    }, 120);
+
+    // Multiple attempts because iOS keyboard animation is slow and the layout settles late.
+    const attempt = (delay: number) => {
+      window.setTimeout(() => {
+        const vv = window.visualViewport;
+        if (!vv || !scrollRef.current) return;
+        const keyboard = Math.max(0, window.innerHeight - vv.height);
+        const rect = input.getBoundingClientRect();
+        const visibleBottom = vv.height - 24;
+        if (rect.bottom > visibleBottom) {
+          const delta = rect.bottom - visibleBottom + 16;
+          scrollRef.current.scrollBy({ top: delta, behavior: delay < 100 ? "auto" : "smooth" });
+        }
+        // Also pull it down a bit if it jumped too high.
+        if (rect.top < 70) {
+          scrollRef.current.scrollBy({ top: rect.top - 80, behavior: "smooth" });
+        }
+      }, delay);
+    };
+
+    attempt(40);
+    attempt(180);
+    attempt(400);
+    attempt(700);
+  };
+
+  const onBlur = () => {
+    focusedInput.current = null;
   };
 
   return (
@@ -167,6 +197,7 @@ export function AddSheet({
                 setDraft((d) => ({ ...d, name, emoji: emojiForName(name) }));
               }}
               onFocus={keepVisible}
+              onBlur={onBlur}
               placeholder={t.whatAtePlaceholder}
               autoCapitalize="sentences"
               enterKeyHint="done"
@@ -200,6 +231,7 @@ export function AddSheet({
               value={draft.note}
               onChange={(e) => setDraft((d) => ({ ...d, note: e.target.value }))}
               onFocus={keepVisible}
+              onBlur={onBlur}
               placeholder={t.notePlaceholder}
             />
 
@@ -216,6 +248,7 @@ export function AddSheet({
                       setDraft((d) => ({ ...d, kcal: e.target.value.replace(/[^\d]/g, "") }))
                     }
                     onFocus={keepVisible}
+                    onBlur={onBlur}
                     placeholder="—"
                   />
                   <span className="pointer-events-none absolute inset-y-0 right-3 grid place-items-center text-sm text-muted">
@@ -231,6 +264,7 @@ export function AddSheet({
                   value={draft.time}
                   onChange={(e) => setDraft((d) => ({ ...d, time: e.target.value }))}
                   onFocus={keepVisible}
+                  onBlur={onBlur}
                 />
               </div>
             </div>
